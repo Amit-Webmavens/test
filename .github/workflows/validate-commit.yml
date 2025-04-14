@@ -1,0 +1,19 @@
+name: Validate Commit Messages
+
+on: [push, pull_request]
+
+jobs:
+  check-commit-message:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check commit messages
+        run: |
+          echo "Checking commit messages..."
+          for commit in $(git log --pretty=format:%H ${{ github.event.before }}..${{ github.sha }}); do
+            message=$(git log -1 --pretty=format:%s $commit)
+            echo "Checking commit: $commit - $message"
+            if ! echo "$message" | grep -qE "#[0-9]+"; then
+              echo "❌ Commit message '$message' does not contain an issue number like #123"
+              exit 1
+            fi
+          done
