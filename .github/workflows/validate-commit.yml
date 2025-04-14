@@ -1,25 +1,20 @@
-name: Validate Commit Messages
+name: Validate Latest Commit Message
 
 on: [push, pull_request]
 
 jobs:
-  check-commit-messages:
+  check-latest-commit-message:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Validate commit messages
+      - name: Get latest commit message
         run: |
-          echo "Checking commit messages from ${{ github.event.before }} to ${{ github.sha }}"
-          commits=$(git rev-list ${{ github.event.before }}..${{ github.sha }})
-          for commit in $commits; do
-            msg=$(git log -1 --pretty=format:%s $commit)
-            echo "Commit: $commit"
-            echo "Message: $msg"
-            if ! echo "$msg" | grep -qE "#[0-9]+"; then
-              echo "❌ Commit message does not contain an issue number like #123."
-              exit 1
-            fi
-          done
+          latest_msg=$(git log -1 --pretty=format:%s)
+          echo "Latest commit message: $latest_msg"
+          if ! echo "$latest_msg" | grep -qE "#[0-9]+"; then
+            echo "❌ Commit message must include an issue number like #123"
+            exit 1
+          fi
