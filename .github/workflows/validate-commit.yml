@@ -9,10 +9,13 @@ jobs:
     steps:
       - name: Validate latest commit message (title + body)
         run: |
-          message="${{ github.event.head_commit.message }}"
+          echo "Fetching full commit message from GitHub context..."
+          echo "${{ github.event.head_commit.message }}" > commit_message.txt
+
           echo "Full commit message:"
-          echo "$message"
-          if ! echo "$message" | grep -qE "#[0-9]+"; then
+          cat commit_message.txt
+
+          if ! grep -qE "#[0-9]+" commit_message.txt; then
             echo "❌ Commit message must include an issue number like #123"
             exit 1
           fi
