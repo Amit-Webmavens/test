@@ -15,7 +15,16 @@ jobs:
           echo "Full commit message:"
           cat commit_message.txt
 
+          # Allow merge commits
+          if grep -qE "^Merge " commit_message.txt; then
+            echo "ℹ️ Merge commit detected. Skipping issue number check."
+            exit 0
+          fi
+
+          # Enforce issue number format like #123
           if ! grep -qE "#[0-9]+" commit_message.txt; then
             echo "❌ Commit message must include an issue number like #123"
             exit 1
           fi
+
+          echo "✅ Commit message includes an issue number."
